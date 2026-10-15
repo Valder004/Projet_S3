@@ -1,0 +1,24 @@
+---
+import Layout from '../layouts/Layout.astro';
+import pb from '../lib/pocketbase';
+
+// Vérifie que PocketBase répond (lancer `bun run db` dans un autre terminal)
+let pbStatus = 'hors ligne';
+try {
+  await pb.health.check();
+  pbStatus = 'connecté';
+} catch {}
+---
+
+<Layout>
+  <main class="mx-auto max-w-2xl p-8">
+    <h1 class="text-4xl font-bold text-indigo-600">Projet S3</h1>
+    <p class="mt-4">Astro + Tailwind CSS + PocketBase, avec Bun.</p>
+    <p class="mt-2">
+      PocketBase :
+      <span class={pbStatus === 'connecté' ? 'font-semibold text-green-600' : 'font-semibold text-red-600'}>
+        {pbStatus}
+      </span>
+    </p>
+  </main>
+</Layout>
