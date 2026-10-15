@@ -1,24 +1,129 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import pb from '../lib/pocketbase';
+import { Image } from "astro:assets";
+import Layout from "../layouts/Layout.astro";
+import ProjectCard from "../components/ProjectCard.astro";
+import ContactBanner from "../components/ContactBanner.astro";
+import Portrait from "../components/Portrait.astro";
+import Button from "../components/Button.astro";
+import Stripes from "../components/Stripes.astro";
+import { expertises } from "../data/projects.js";
+import { getProjects } from "../lib/projects.js";
+import heroPhoto from "../assets/match-nuit.jpg";
 
-// Vérifie que PocketBase répond (lancer `bun run db` dans un autre terminal)
-let pbStatus = 'hors ligne';
-try {
-  await pb.health.check();
-  pbStatus = 'connecté';
-} catch {}
+const projects = await getProjects();
+const featured = projects.slice(0, 2);
+
+const approach = [
+  { title: "Comprendre", text: "Je pars du public : qui il est, ce qu'il attend, où il se trouve." },
+  { title: "Créer", text: "Une identité et des contenus qui se reconnaissent au premier coup d'œil." },
+  { title: "Activer", text: "Des idées pensées pour vivre sur le terrain et sur les réseaux." },
+];
+
+// Conteneur commun : largeur max + marges latérales
+const container = "mx-auto max-w-7xl px-5 md:px-8";
 ---
 
 <Layout>
-  <main class="mx-auto max-w-2xl p-8">
-    <h1 class="text-4xl font-bold text-indigo-600">Projet S3</h1>
-    <p class="mt-4">Astro + Tailwind CSS + PocketBase, avec Bun.</p>
-    <p class="mt-2">
-      PocketBase :
-      <span class={pbStatus === 'connecté' ? 'font-semibold text-green-600' : 'font-semibold text-red-600'}>
-        {pbStatus}
-      </span>
-    </p>
-  </main>
+  <!-- Ouverture -->
+  <section class:list={[container, "grid items-center gap-10 py-12 md:py-16 lg:grid-cols-[1.2fr_0.8fr] lg:gap-14 lg:py-20"]}>
+    <div>
+      <p class="text-lg font-semibold">Valentin Deroo, étudiant en MMI</p>
+      <h1 class="mt-4 font-varsity text-[clamp(2.25rem,8.5vw,3.75rem)] leading-[0.95] uppercase lg:text-[clamp(2.5rem,4.6vw,4.5rem)]">
+        Créer le jeu, marquer les esprits.
+      </h1>
+      <p class="mt-6 max-w-xl text-lg leading-relaxed text-slate md:text-xl">
+        Je veux faire vivre le sport à travers des messages, des contenus et des campagnes
+        qui rapprochent les clubs, les marques et les événements de leurs publics.
+      </p>
+      <div class="mt-8 flex flex-wrap gap-3">
+        <Button href="/projets">Voir mes projets</Button>
+        <Button href="/contact" variant="outline">Me contacter</Button>
+      </div>
+    </div>
+
+    <div class="relative">
+      <!-- Ombre portée orange décalée, comme le lettrage du logo -->
+      <div aria-hidden="true" class="absolute inset-0 translate-x-3 translate-y-3 bg-orange"></div>
+      <Image
+        src={heroPhoto}
+        alt="Match de football amateur de nuit sous la pluie, éclairé par un projecteur"
+        widths={[640, 1000, 1400, 1800]}
+        sizes="(min-width: 1024px) 45vw, 100vw"
+        loading="eager"
+        fetchpriority="high"
+        class="relative block aspect-[4/3] w-full border-[1.5px] border-ink object-cover object-[50%_70%]"
+      />
+    </div>
+  </section>
+
+  <Stripes />
+
+  <!-- Méthode -->
+  <section class:list={[container, "py-16 md:py-24"]} aria-labelledby="approach-title">
+    <h2 id="approach-title" class="font-varsity text-[clamp(1.75rem,4.5vw,2.75rem)] leading-[1.05] uppercase">Ma façon de travailler</h2>
+    <div class="mt-10 grid gap-8 md:grid-cols-3 md:gap-10">
+      {
+        approach.map((step) => (
+          <div class="border-t-4 border-ink pt-5">
+            <h3 class="text-2xl font-bold">{step.title}</h3>
+            <p class="mt-2 text-lg leading-relaxed text-slate">{step.text}</p>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- Projets -->
+  <section class="bg-chalk py-16 md:py-24" aria-labelledby="projects-title">
+    <div class={container}>
+      <div class="flex flex-wrap items-end justify-between gap-4">
+        <h2 id="projects-title" class="font-varsity text-[clamp(1.75rem,4.5vw,2.75rem)] leading-[1.05] uppercase">Projets récents</h2>
+        <a href="/projets" class="font-semibold underline decoration-2 underline-offset-4 hover:text-orange">
+          Voir les {projects.length} projets
+        </a>
+      </div>
+      <div class="mt-10 grid gap-6 md:grid-cols-2 md:gap-8">
+        {featured.map((project) => <ProjectCard project={project} />)}
+      </div>
+    </div>
+  </section>
+
+  <!-- Présentation -->
+  <section class:list={[container, "grid items-center gap-10 py-16 md:grid-cols-[0.8fr_1.2fr] md:gap-16 md:py-24"]} aria-labelledby="about-title">
+    <Portrait />
+    <div>
+      <h2 id="about-title" class="font-varsity text-[clamp(1.75rem,4.5vw,2.75rem)] leading-[1.05] uppercase">
+        Le sport me passionne, la communication m'anime.
+      </h2>
+      <p class="mt-6 max-w-xl text-lg leading-relaxed">
+        Moi, c'est Valentin. Après une licence STAPS (2022-2025), je poursuis en BUT MMI (2025-2028)
+        avec un objectif : travailler dans la communication sportive.
+      </p>
+      <p class="mt-4 max-w-xl leading-relaxed text-slate">
+        Je veux mettre cette double culture au service d'un club, d'une marque ou d'un événement.
+        Le design et les outils numériques m'aident à donner forme aux messages, mais la communication
+        reste au cœur de mon projet.
+      </p>
+      <Button href="/a-propos" variant="outline" class="mt-8">Découvrir mon parcours</Button>
+    </div>
+  </section>
+
+  <!-- Savoir-faire -->
+  <section class="bg-chalk py-16 md:py-24" aria-labelledby="skills-title">
+   <div class={container}>
+    <h2 id="skills-title" class="font-varsity text-[clamp(1.75rem,4.5vw,2.75rem)] leading-[1.05] uppercase">Ce que je sais faire</h2>
+    <div class="mt-10 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+      {
+        expertises.map(([title, text]) => (
+          <div class="border-t-[3px] border-orange pt-5">
+            <h3 class="text-lg font-semibold">{title}</h3>
+            <p class="mt-2 leading-relaxed text-slate">{text}.</p>
+          </div>
+        ))
+      }
+    </div>
+   </div>
+  </section>
+
+  <ContactBanner text="Une alternance, un stage ou un projet de communication : parlons-en." />
 </Layout>
